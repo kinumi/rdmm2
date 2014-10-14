@@ -24,13 +24,13 @@ module RDMM2
       }
     end
 
-    def run
+    def execute
       @parameters[:timestamp] = Time.now.strftime('%Y/%m/%d %H:%M:%S')
       return RDMM2::Response.new(Nokogiri::XML(open("#{API_URI}#{URI.encode_www_form(@parameters)}"))).response.result
     end
 
     def method_missing(method_name, *args)
-      @parameters[method_name] = args.first.encode('EUC-JP')
+      @parameters[method_name] = args.first.to_s.encode('EUC-JP')
       return self
     end
 

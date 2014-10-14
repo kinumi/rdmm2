@@ -19,8 +19,16 @@ class Rdmm2Test < Test::Unit::TestCase
     # Do nothing
   end
 
-  def test_test
-    result = @client.site('DMM.co.jp').keyword("エロ").run
+  def test_test1
+    result = @client.site('DMM.co.jp').keyword('エロ').execute
+    assert_equal "1", result.first_position
+    result.items.item.each do |item|
+      assert_not_nil item.title
+    end
+  end
+
+  def test_test2
+    result = @client.site('DMM.co.jp').service(:mono).floor(:dvd).keyword('AV').execute
     assert_equal "1", result.first_position
     result.items.item.each do |item|
       assert_not_nil item.title
