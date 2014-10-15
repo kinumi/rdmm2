@@ -1,10 +1,12 @@
 # coding: utf-8
 
-require 'rubygems'
-require 'bundler/setup'
-Bundler.require
+require 'uri'
+require 'open-uri'
 
-require File.dirname(__FILE__) + '/rdmm2/response'
+require 'rubygems'
+require 'nokogiri'
+
+require File.dirname(__FILE__) + '/rdmm2/request'
 require File.dirname(__FILE__) + '/rdmm2/version'
 
 module RDMM2
@@ -13,25 +15,27 @@ module RDMM2
 
   class ItemListOperation
 
-    OPERATION = 'ItemList'
+    OPERATION       = 'ItemList'
+
+    SITE_DMM_COM    = 'DMM.com'
+    SITE_DMM_CO_JP  = 'DMM.co.jp'
+    DEFAULT_SITE    = SITE_DMM_COM
 
     def initialize(account_id, affiliate_id)
-      @parameters = {
-          :account_id => account_id,
-          :affiliate_id => affiliate_id,
+      @account_id = account_id
+      @affiliate_id = affiliate_id
+    end
+
+    def request(options = {})
+      params = {
+          :account_id => @account_id,
+          :affiliate_id => @affiliate_id,
           :version => API_VERSION,
           :operation => OPERATION,
+          :site => DEFAULT_SITE,
       }
-    end
-
-    def execute
-      @parameters[:timestamp] = Time.now.strftime('%Y/%m/%d %H:%M:%S')
-      return RDMM2::Response.new(Nokogiri::XML(open("#{API_URI}#{URI.encode_www_form(@parameters)}"))).response.result
-    end
-
-    def method_missing(method_name, *args)
-      @parameters[method_name] = args.first.to_s.encode('EUC-JP')
-      return self
+      params.merge(options)
+      RDMM2::Request.new(params)
     end
 
   end

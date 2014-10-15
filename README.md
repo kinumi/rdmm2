@@ -1,10 +1,8 @@
 # RDMM2
 
-**aplha** APIがふらふらしてます。なのでgemも未リリース。
+A Ruby client for DMM Web Service API 2.0
 
-Rubyで使える、DMM Web Service 2.0のクライアントライブラリです。
-
-同様のライブラリは既に現時点でいくつか存在してますが、しっくりこなかったので、とりあえず自分用に車輪を再発明。
+DMM Web Service 2.0の、Ruby用クライアントライブラリです。
 
 
 ## Installation
@@ -21,9 +19,54 @@ Or install it yourself as:
 
     $ gem install rdmm2
 
+
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+## クライアントの生成
+
+client = RDMM2::ItemListOperation.new(YOUR_API_ID, YOUR_AFFILIATE_ID)
+
+
+## 検索の実行
+
+# 設定できる検索条件はDMM Web Service 2.0仕様を参照してください。
+# 下記は検索条件設定の一例です。
+
+# 'DMM.com'を条件無しで検索 (デフォルト)
+result = client.request.execute 
+# 'DMM.co.jp'をキーワード検索
+result = client.request.site('DMM.co.jp').keyword('巨乳').execute
+# 取得件数、オフセット、ソート条件の指定
+result = client.request.hits(100).offset(:date).execute
+
+
+## 検索結果の取得
+
+# 取得できる情報はDMM Web Service 2.0仕様を参照してください。
+# 下記は一例です。
+
+result.result_count                 # => 取得件数(String)
+result.total_count                  # => 全体件数(String)
+result.first_position               # => 検索開始位置(String)
+
+result.items.item[0].service_name   # => サービス名(String)
+result.items.item[0].floor_name     # => フロア名(String)
+result.items.item[0].category_name  # => カテゴリ名(String)
+result.items.item[0].content_id     # => 商品ID(String)
+result.items.item[0].product_id     # => 品番(String)
+result.items.item[0].title          # => タイトル(String)
+result.items.item[0].URL            # => 商品ページURL(String)
+result.items.item[0].affiliateURL   # => アフィリエイトリンクURL(String)
+result.items.item[0].URLsp          # => スマホ向け商品ページURL（あればString, なければnil）
+result.items.item[0].affiliateURLsp # => スマホ向けアフィリエイトリンクURL（あればString, なければnil）
+result.items.item[0].imageURL.list  # => 画像URLリスト用(String)
+result.items.item[0].imageURL.small # => 画像URL末端用(小)(String)
+result.items.item[0].imageURL.large # => 画像URL末端用(大)(String)
+```
+
+specファイルも参照してください。
+
 
 ## Contributing
 

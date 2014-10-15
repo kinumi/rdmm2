@@ -1,4 +1,5 @@
 # coding: utf-8
+
 module RDMM2
   class Response
 
@@ -23,22 +24,24 @@ module RDMM2
     end
 
     def each(&block)
-      @doc.each do |elem|
-        yield RDMM2::Response.new(elem)
+      self.to_a.each do |elem|
+        yield elem
       end
     end
 
-    def [](elem_name)
+    def [](index)
+      self.to_a[index]
+    end
+
+    def method_missing(elem_name)
       elem = @doc.css("> #{elem_name}")
-      if elem.children.size == 1 && elem.children.first.text?
+      if elem.empty?
+        nil
+      elsif elem.size == 1 && elem.children.size == 1 && elem.children.first.text?
         elem.text
       else
         RDMM2::Response.new(elem)
       end
-    end
-
-    def method_missing(elem_name)
-      self[elem_name]
     end
 
   end
