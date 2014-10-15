@@ -1,6 +1,6 @@
 # RDMM2
 
-*aplha* APIがふらふらしてます。なのでgemも未リリース。
+**aplha** APIがふらふらしてます。なのでgemも未リリース。
 
 Rubyで使える、DMM Web Service 2.0のクライアントライブラリです。
 
