@@ -1,18 +1,26 @@
 require File.dirname(__FILE__) + '/../lib/rdmm2'
 require 'rspec'
 
-describe 'ItemListOperation' do
+#
+# 本テストの実行には、ホームディレクトリに'.rdmm2_test'ファイルが必要です。
+#
+# $ cat ~/.rdmm2_test
+# {:api_id => YOUR_API_ID, :affiliate_id => YOUR_AFFILIATE_ID}
+#
+
+describe 'RDMM2::ItemListOperation' do
+
   before :all do
     @test_info = eval(File.read(File.expand_path('~/.rdmm2_test')))
     @client = RDMM2::ItemListOperation.new(@test_info[:api_id], @test_info[:affiliate_id])
   end
 
-  describe '検索条件無し' do
+  describe '検索条件無しで検索する' do
     let(:result) do
       @client.request.execute
     end
 
-    it '主要なレスポンスフィールドを持っている' do
+    it '結果が主要なレスポンスフィールドを持っている' do
       # 取得件数
       expect(result.result_count).to be_a(String)
       # 全体件数
@@ -57,18 +65,18 @@ describe 'ItemListOperation' do
       end
     end
 
-    it '(おそらく) 20個の結果を持つ' do
+    it '結果が商品情報を20個持つ' do
       expect(result.result_count).to eq('20')
       expect(result.items.item.size).to eq(20)
     end
   end
 
-  describe 'DMM.com 通販(スマホ向けページが有る)' do
+  describe 'DMM.com　通販　(スマホ向けページが有る)　を検索する' do
     let(:result) do
       @client.request.service(:mono).floor(:dvd).execute
     end
 
-    it 'スマホ向けページが取得できる' do
+    it 'スマホ向けページが取得できる(String)' do
       # |- 商品
       expect(result.items.item).to be_a(RDMM2::Response)
       begin
@@ -80,12 +88,12 @@ describe 'ItemListOperation' do
     end
   end
 
-  describe 'DMM.com PCソフト(スマホ向けページが無い)' do
+  describe 'DMM.com　PCソフト　(スマホ向けページが無い)　を検索する' do
     let(:result) do
       @client.request.service(:pcsoft).floor(:pcgame).execute
     end
 
-    it 'スマホ向けページが無い(nil)' do
+    it 'スマホ向けページが取得できない(nil)' do
       # |- 商品
       expect(result.items.item).to be_a(RDMM2::Response)
       begin
@@ -97,28 +105,28 @@ describe 'ItemListOperation' do
     end
   end
 
-  describe '取得件数指定あり' do
+  describe '取得件数指定ありで検索する' do
     let(:result) do
       @client.request.site('DMM.com').keyword('AKB').hits(100).execute
     end
 
-    it '検索結果が100個となる' do
+    it '結果が商品情報を100個持つ' do
       expect(result.result_count).to eq('100')
       expect(result.items.item.size).to eq(100)
     end
   end
 
-  describe '検索開始位置指定あり' do
+  describe '検索開始位置指定ありで検索する' do
     let(:result) do
       @client.request.site('DMM.com').keyword('AKB').offset(100).execute
     end
 
-    it '検索開始位置が100となる' do
+    it '結果の検索開始位置が100になる' do
       expect(result.first_position).to eq('100')
     end
   end
 
-  describe 'ソート条件あり' do
+  describe 'ソート条件ありで検索する' do
     let(:result_not_ordered) do
       @client.request.site('DMM.com').keyword('AKB').execute
     end
@@ -126,12 +134,31 @@ describe 'ItemListOperation' do
       @client.request.site('DMM.com').keyword('AKB').sort(:date).execute
     end
 
-    it '並び順が変更されている' do
+    it '結果の並び順が変更されている' do
       expect(result_ordered.items.item[0].title).not_to eq(result_not_ordered.items.item[0].title)
     end
   end
 
-  describe 'eachで回せる' do
+  describe 'リクエストの構築と実行を分離する' do
+    let(:result) do
+      request = @client.request
+      request = request.keyword('AKB')
+      request = request.hits(100)
+      request = request.offset(101)
+      request.execute
+    end
+
+    it '100個の結果を持つ' do
+      expect(result.result_count).to eq('100')
+      expect(result.items.item.size).to eq(100)
+    end
+
+    it '検索開始位置が101となる' do
+      expect(result.first_position).to eq('101')
+    end
+  end
+
+  describe '結果をeachで回す' do
     let(:result) do
       @client.request.execute
     end
