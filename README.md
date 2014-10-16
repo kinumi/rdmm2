@@ -22,6 +22,8 @@ Or install it yourself as:
 
 ## Usage
 
+使い方については、specも参照してください。
+
 ```ruby
 ## クライアントの生成
 
@@ -36,10 +38,16 @@ client = RDMM2::ItemListOperation.new(YOUR_API_ID, YOUR_AFFILIATE_ID)
 # 'DMM.com'を条件無しで検索 (デフォルト)
 result = client.request.execute 
 # 'DMM.co.jp'をキーワード検索
-result = client.request.site('DMM.co.jp').keyword('巨乳').execute
+result = client.request.site('DMM.co.jp').keyword('AV').execute
 # 取得件数、オフセット、ソート条件の指定
 result = client.request.hits(100).offset(:date).execute
 
+# リクエストの構築と実行を分割することも可能
+request = client.request
+request = request.keyword('AKB')
+request = request.hits(100)
+request = request.offset(101)
+result  = request.execute
 
 ## 検索結果の取得
 
@@ -65,12 +73,10 @@ result.items.item[0].imageURL.small # => 画像URL末端用(小)(String)
 result.items.item[0].imageURL.large # => 画像URL末端用(大)(String)
 ```
 
-specファイルも参照してください。
-
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/rdmm2/fork )
+1. Fork it ( https://github.com/kinumi/rdmm2/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
